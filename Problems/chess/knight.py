@@ -33,6 +33,7 @@ def make_move_from_move(start: move, by):
     return move(start, square(move_file_by(start.end.file, by[0]), move_rank_by(start.end.rank, by[1])))
 
 def possible_moves_knight(start) -> [move]:
+    # using the type function seems icky
     return [moved for moved in [(make_move_from_square(start, m) if type(start) == square else make_move_from_move(start, m)) for m in KNIGHT_MOVES] if all(moved.end)]
 
 def build_path(node: move) -> [square]:
