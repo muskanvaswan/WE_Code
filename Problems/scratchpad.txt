@@ -1,0 +1,11 @@
+a list of roll numbers for n students, roll numbers from 1 to n,
+given a list of numbers of attending students
+there is one absentee
+
+
+sum of range(1, n+1) - sum of attendances
+won't work for non numeric roll numbers
+o(n + 1)
+
+set_difference(range(1, n+1), attendance)
+o(2n)
