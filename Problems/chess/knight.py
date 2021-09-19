@@ -29,12 +29,12 @@ def move_rank_by(rank: str, by: int):
 def make_move_from_square(start: square, by):
     return move(move(None, start), square(move_file_by(start.file, by[0]), move_rank_by(start.rank, by[1])))
 
-def make_move_from_move(start: move, by):
+def make_move(start: move, by):
     return move(start, square(move_file_by(start.end.file, by[0]), move_rank_by(start.end.rank, by[1])))
 
 def possible_moves_knight(start) -> [move]:
     # using the type function seems icky
-    return [moved for moved in [(make_move_from_square(start, m) if type(start) == square else make_move_from_move(start, m)) for m in KNIGHT_MOVES] if all(moved.end)]
+    return [moved for moved in [make_move(start, m) for m in KNIGHT_MOVES] if all(moved.end)]
 
 def build_path(node: move) -> [square]:
     path = []
@@ -43,20 +43,38 @@ def build_path(node: move) -> [square]:
         node = node.start
     return path[::-1]
 
+
+# Non recursive approach
 def track_path_knight(start: square, end: square) -> [square]:
     # perform a depth first search on nodes
-    frontier, visited = [], []
+    frontier = []
+    aux_board = {key.lower(): [False]*8 for key in FILES}
     frontier.append(move(None, start))
     while frontier != []:
         node = frontier.pop(0)
         if valid_knight_move(node.end, end):
             return build_path(move(node, end))
-        if node.end not in visited:
-            visited.append(node.end)
+        if not aux_board[node.end.file][int(node.end.rank) - 1]:
+            aux_board[node.end.file][int(node.end.rank) - 1] = True
             for moved in possible_moves_knight(node):
                 frontier.append(moved)
 
 
 
-print(track_path_knight(square('a', '8'), square('e', '3')))
-#print(possible_moves_knight(square('d', '4')))
+# Recursive approach
+frontier = []
+aux_board = {key.lower(): [False]*8 for key in FILES}
+
+def knight_path(start: move, end: square) -> [square]:
+    global frontier, aux_board
+    if valid_knight_move(start.end, end):
+        return build_path(move(start, end))
+    if not aux_board[start.end.file][int(start.end.rank) - 1]:
+        frontier += possible_moves_knight(start)
+        aux_board[start.end.file][int(start.end.rank) - 1] = True
+    return knight_path(frontier.pop(0), end)
+
+
+
+print(track_path_knight(square('e', '8'), square('e', '3')))
+print(knight_path(move(None, square('e', '8')), square('e', '3')))
